@@ -25,6 +25,11 @@ class Ship:
         # Movement flag; start with a ship that is not moving.
         self.moving_right = False
         self.moving_left = False
+
+    def center_ship(self):
+        self.rect.center = self.screen_rect.center
+        self.rect.bottom = self.screen_rect.height - 20
+        self.x = float(self.rect.x)
         
         
     def blitme(self):

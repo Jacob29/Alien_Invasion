@@ -14,9 +14,8 @@ class Button:
         self.text_colour = (255, 255, 255)
         self.font = pygame.font.SysFont(None, 48)
 
-        # Build the button's rect object and center it
-        self.rect = pygame.Rect(0, 0, self.width, self.height)
-        self.rect.center = self.screen_rect.center
+        
+
 
         # The button message needs to be prepped only once.
         self._prep_msg(msg)
@@ -25,9 +24,23 @@ class Button:
         """Turn msg into a rendered image and center text on the button."""
         self.msg_image = self.font.render(msg, True, self.text_colour, self.button_colour)
         self.msg_image_rect = self.msg_image.get_rect()
-        self.msg_image_rect.center = self.rect.center
+        # self.msg_image_rect.center = self.rect.center
 
-    def draw_button(self):
+    def draw_play_button(self):
         """Draw blank button and then draw message."""
+        # Build the button's rect object and center it
+        self.rect = pygame.Rect(0, 0, self.width, self.height)
+        self.rect.center = self.screen_rect.center
+
         self.screen.fill(self.button_colour, self.rect)
+        self.msg_image_rect.center = self.rect.center
+        self.screen.blit(self.msg_image, self.msg_image_rect)
+
+    def draw_diff_buttons(self):
+        """Draw three blank buttons and then draw the messages inside"""
+        self.rect = pygame.Rect(0, 0, self.width, self.height)
+        self.rect.center = self.screen_rect.center
+
+        self.screen.fill(self.button_colour, self.rect)
+        self.msg_image_rect.center = (self.rect.center - 20)
         self.screen.blit(self.msg_image, self.msg_image_rect)

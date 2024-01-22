@@ -25,6 +25,7 @@ class Ship:
         # Movement flag; start with a ship that is not moving.
         self.moving_right = False
         self.moving_left = False
+        self.booster = False
 
     def center_ship(self):
         self.rect.center = self.screen_rect.center
@@ -39,10 +40,16 @@ class Ship:
     def update(self):
         """Update the ships position based on the movement flag."""
         # Update the ship's x value, not the rect.
-        if self.moving_right and self.rect.right < self.screen_rect.right:
-            self.x += self.settings.ship_speed
-        if self.moving_left and self.rect.left > 0:
-            self.x -= self.settings.ship_speed
+        if self.booster:
+            if self.moving_right and self.rect.right < self.screen_rect.right:
+                self.x += self.settings.ship_speed + self.settings.ship_booster
+            if self.moving_left and self.rect.left > 0:
+                self.x -= self.settings.ship_speed + self.settings.ship_booster
+        else:        
+            if self.moving_right and self.rect.right < self.screen_rect.right:
+                self.x += self.settings.ship_speed
+            if self.moving_left and self.rect.left > 0:
+                self.x -= self.settings.ship_speed
 
         # Update rect object from self.x
         self.rect.x = self.x

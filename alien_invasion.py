@@ -105,6 +105,7 @@ class AlienInvasion:
             if not self.game_active:
                 self._start_game()        
         elif event.key == pygame.K_ESCAPE:
+            self.stats.save_stats()
             sys.exit()
 
     def _check_keyup_events(self, event):
@@ -133,6 +134,10 @@ class AlienInvasion:
         self.stats.reset_stats()
         self.settings.initialize_dynamic_settings()
         self.game_active = True
+        self.sb.prep_score()
+        self.sb.prep_high_score()
+        self.sb.prep_level()
+        self.sb.prep_ships()
         pygame.mouse.set_visible(False)
 
     def _fire_bullet(self):
@@ -161,6 +166,7 @@ class AlienInvasion:
             # Create a new fleet and center the ship.
             self._create_fleet
             self.ship.center_ship()
+            self.sb.prep_ships()
 
             # Pause.
             sleep(0.5)
@@ -189,16 +195,24 @@ class AlienInvasion:
         """Respond to bullet-alien collisions"""
         # Remove any bullets and aliens that have collided
         collisions = pygame.sprite.groupcollide(
-            self.bullets, self.aliens, True, True)
-        
-        collisions = pygame.sprite.groupcollide(
+            self.bullets, self.aliens, True, True) or pygame.sprite.groupcollide(
             self.beams, self.aliens, False, True)
+        
+         
+        
+        if collisions:
+            for aliens in collisions.values():
+                self.stats.score += self.settings.alien_points * len(aliens)
+            self.sb.prep_score()
+            self.sb.check_high_score()
         
         if not self.aliens:
             # Destroy existing bullets and create new fleet.
             self.bullets.empty()
             self.beams.empty()
             self.settings.increase_speed()
+            self.sb.increase_level()
+            self.sb.prep_level()
             self._create_fleet()
             self.ship.center_ship()
 
@@ -228,11 +242,11 @@ class AlienInvasion:
         while current_y < (self.settings.screen_height - 3 * alien_height):
             while current_x < (self.settings.screen_width - 2 * alien_width):
                 self._create_alien(current_x, current_y)
-                current_x += 2 * alien_width
+                current_x += 2.5 * alien_width
 
             # Finished a row' reset x vlaue, and increment y value
             current_x = start_x
-            current_y += 2 * alien_height
+            current_y += 2.5 * alien_height
 
     def _check_fleet_edges(self):
         """Respond appropriately if any aliens have reached an edge."""

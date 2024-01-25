@@ -7,6 +7,7 @@ from bullet import Bullet
 from alien import Alien
 from beam import Beam
 from game_stats import GameStats
+from scoreboard import Scoreboard
 from button import Button
 
 class AlienInvasion:
@@ -24,6 +25,7 @@ class AlienInvasion:
         pygame.display.set_caption("Alien Invasion")
 
         self.stats = GameStats(self)
+        self.sb = Scoreboard(self)
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
@@ -35,7 +37,7 @@ class AlienInvasion:
         # Start AI in an active state.
         self.game_active = False
 
-        self.play_button = Button(self, "Playz")
+        # self.play_button = Button(self, "Play")
 
         self._make_difficulty_buttons()
 
@@ -57,8 +59,21 @@ class AlienInvasion:
 
     def _make_difficulty_buttons(self):
         self.easy_button = Button(self, "Easy")
-        self.norm_button = Button(self, "Normal")
+        self.medium_button = Button(self, "Medium")
         self.hard_button = Button(self, "Hard")
+
+        # Position buttons so they don't all overlap.
+        self.easy_button.rect.top = (
+            self.easy_button.rect.top + 1.5*self.easy_button.rect.height)
+        self.medium_button.rect.top = (
+            self.medium_button.rect.top + 1.5*self.medium_button.rect.height)
+        self.hard_button.rect.top = (
+            self.hard_button.rect.top + 1.5*self.hard_button.rect.height)
+        
+        self.easy_button.rect.left = (
+            self.easy_button.rect.left - 1.5*self.easy_button.rect.width)
+        self.hard_button.rect.left = (
+            self.hard_button.rect.left + 1.5*self.hard_button.rect.width)
 
     def _check_events(self):
         """Respond to keypresses and mouse events."""
@@ -103,7 +118,14 @@ class AlienInvasion:
 
     def _check_play_button(self, mouse_pos):
         """Start a new game when the player clicks Play"""
-        if self.play_button.rect.collidepoint(mouse_pos) and not self.game_active:
+        if self.easy_button.rect.collidepoint(mouse_pos) and not self.game_active:
+            self.settings.difficulty_level = 'easy'
+            self._start_game()
+        if self.medium_button.rect.collidepoint(mouse_pos) and not self.game_active:
+            self.settings.difficulty_level = 'medium'
+            self._start_game()
+        if self.hard_button.rect.collidepoint(mouse_pos) and not self.game_active:
+            self.settings.difficulty_level = 'hard'
             self._start_game()
 
     def _start_game(self):
@@ -247,15 +269,18 @@ class AlienInvasion:
         self.screen.fill(self.settings.bg_colour)
 
         if not self.game_active:
-            self.play_button.draw_play_button()
-            self.easy_button.draw_diff_buttons()
+            # self.play_button.draw_button()
+            self.easy_button.draw_button()
+            self.medium_button.draw_button()
+            self.hard_button.draw_button()
         else:
             for bullet in self.bullets.sprites():
                 bullet.draw_bullet()
             for beam in self.beams.sprites():
                 beam.draw_beam()
             self.ship.blitme()
-            self.aliens.draw(self.screen)  
+            self.aliens.draw(self.screen)
+            self.sb.show_score()
 
         pygame.display.flip()
         
